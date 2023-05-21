@@ -18,7 +18,7 @@ import (
 )
 
 var UserCollection *mongo.Collection = database.UserData(database.Client, "Users")
-var productCollection *mongo.Collection = database.ProductData(database.Client, "Products")
+var ProductCollection *mongo.Collection = database.ProductData(database.Client, "Products")
 var Validate = validator.New()
 
 func HashPassword(password string) string {
@@ -155,7 +155,7 @@ func SearchProduct() gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
-		cursor, err := productCollection.Find(ctx, bson.D{{}})
+		cursor, err := ProductCollection.Find(ctx, bson.D{{}})
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, "Something went wront please try again later")
 			return
@@ -196,7 +196,7 @@ func SearchProductByQuery() gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
-		searchquerydb, err := productCollection.Find(ctx, bson.M{"product_name": bson.M{"$regex": queryParam}})
+		searchquerydb, err := ProductCollection.Find(ctx, bson.M{"product_name": bson.M{"$regex": queryParam}})
 
 		if err != nil {
 			c.IndentedJSON(404, "something went wrong while fetchig the data")
