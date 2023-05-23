@@ -16,7 +16,7 @@ var (
 	ErrCantDecodeProducts = errors.New("can't find the product")
 	ErrUserIdIsNotValid   = errors.New("this user is not valid")
 	ErrCantUpdateUser     = errors.New("cannot  add this product to the cart")
-	ErrCantRemoveItemCart = errors.New("cannot remove the item from cart")
+	ErrCantRemoveItem     = errors.New("cannot remove the item from cart")
 	ErrCantGetItem        = errors.New("was unable to get the item from the cart")
 	ErrCantBuyCartItem    = errors.New("cannot update the purchase")
 )
@@ -49,7 +49,21 @@ func AddProductToCart(ctx context.Context, prodCollection, userCollection *mongo
 	return nil
 }
 
-func RemoveCartItem() {}
+func RemoveCartItem(ctx context.Context, prodCollection, userCollection *mongo.Collection, productID primitive.ObjectID, userID string) error {
+	id, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		log.Println(err)
+		return ErrUserIdIsNotValid
+	}
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	update := bson.M{"$pull": bson.M{"usercart": bson.M{"_id": productID}}}
+	_, err = userCollection.UpdateMany(ctx, filter, update)
+	if err != nil {
+		return ErrCantRemoveItem
+	}
+	return nil
+
+}
 
 func BuyItemFromCart() {}
 
